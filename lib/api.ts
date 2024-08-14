@@ -31,7 +31,7 @@ function extractPostEntries(fetchResponse: any): any[] {
 export async function getDrinkBySlug(slug: string | null): Promise<any> {
   const entry = await fetchGraphQL(
     `query {
-      drinksCollection(where: { name: "${slug}" } {
+      drinksCollection(where: {name: "${slug}"})  {
         items {
           ${POST_GRAPHQL_FIELDS}
         }
