@@ -6,6 +6,8 @@ const POST_GRAPHQL_FIELDS = `
     }
 `;
 
+export const drinksTag = "drinks";
+
 async function fetchGraphQL(query: string): Promise<any> {
   return fetch(
     `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
@@ -16,7 +18,7 @@ async function fetchGraphQL(query: string): Promise<any> {
         Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query }),
-      next: { tags: ["posts"] },
+      next: { tags: [drinksTag] },
     },
   ).then((response) => response.json());
 }
