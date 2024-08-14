@@ -1,5 +1,6 @@
 const POST_GRAPHQL_FIELDS = `
     name,
+    slug,
     image {
         url
     }
@@ -31,7 +32,7 @@ function extractPostEntries(fetchResponse: any): any[] {
 export async function getDrinkBySlug(slug: string | null): Promise<any> {
   const entry = await fetchGraphQL(
     `query {
-      drinksCollection(where: {name: "${slug}"})  {
+      drinksCollection(where: {slug: "${slug}"})  {
         items {
           ${POST_GRAPHQL_FIELDS}
         }

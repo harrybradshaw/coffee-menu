@@ -8,7 +8,7 @@ export default async function Home() {
       <h1>COFFEE MENU</h1>
       {drinks.map((drink) => (
         <div key={drink.name}>
-          <Link href={`/coffee/${drink.name}`}>{drink.name}</Link>
+          <Link href={`/coffee/${drink.slug}`}>{drink.name}</Link>
         </div>
       ))}
     </div>
