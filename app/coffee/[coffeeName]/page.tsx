@@ -1,5 +1,5 @@
 import React from "react";
-import { getAllDrinks, getDrinkBySlug } from "@/lib/api";
+import { getDrinkBySlug } from "@/lib/api";
 import Image from "next/image";
 import { BuyDrink } from "@/app/coffee/[coffeeName]/BuyDrink";
 
@@ -22,12 +22,4 @@ export default async function CoffeePage({
       <BuyDrink />
     </>
   );
-}
-
-export async function generateStaticParams() {
-  const drinks = await getAllDrinks();
-
-  return drinks.map((drink) => ({
-    coffeeName: drink.name,
-  }));
 }
