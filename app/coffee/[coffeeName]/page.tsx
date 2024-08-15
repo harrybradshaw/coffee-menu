@@ -11,7 +11,7 @@ export default async function CoffeePage({
   const { coffeeName } = params;
   const drink = await getDrinkBySlug(coffeeName);
   return (
-    <>
+    <div>
       <h1>{drink?.name}</h1>
       <Image
         src={drink?.image.url}
@@ -20,6 +20,6 @@ export default async function CoffeePage({
         height={1200}
       />
       <BuyDrink />
-    </>
+    </div>
   );
 }
