@@ -6,7 +6,10 @@ export const BuyDrink: React.FC = () => {
 
   return (
     <>
-      <h3>You have bought {count} drinks!</h3>
+      <h3>
+        You have bought
+        {count} drinks!
+      </h3>
       <button onClick={() => setCount((pv) => pv + 1)}>Buy Drink</button>
     </>
   );

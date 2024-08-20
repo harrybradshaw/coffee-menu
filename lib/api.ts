@@ -1,90 +1,84 @@
-const POST_GRAPHQL_FIELDS = `
-    name,
-    slug,
-    image {
-        url
-    }
-`;
+import { TypeDrinksSkeleton } from "@/lib/contentfulTypes";
+import type { EntryCollection, EntrySkeletonType } from "contentful";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const extractFieldsFromItems = <TSkeleton extends EntrySkeletonType>(
+  entries: EntryCollection<TSkeleton, "WITHOUT_UNRESOLVABLE_LINKS">,
+) => entries.items.map((i) => i.fields)[0];
+export type Fields<T extends EntrySkeletonType> = ReturnType<
+  typeof extractFieldsFromItems<T>
+>;
 
 export const drinksTag = "drinks";
 
-async function fetchGraphQL(query: string): Promise<any> {
+export async function fetchRest<TReturn extends EntrySkeletonType>(
+  searchParams: URLSearchParams,
+): Promise<EntryCollection<TReturn, "WITHOUT_UNRESOLVABLE_LINKS">> {
   return fetch(
-    `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
+    `https://cdn.contentful.com/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/master/entries?${searchParams.toString()}`,
     {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
-      body: JSON.stringify({ query }),
       next: { tags: [drinksTag] },
     },
   ).then((response) => response.json());
 }
 
-function extractPost(fetchResponse: any): any {
-  return fetchResponse?.data?.drinksCollection?.items?.[0];
-}
+const extractFirstImageUrl = (
+  fetchResponse: EntryCollection<TypeDrinksSkeleton>,
+): string | undefined => {
+  const assets = fetchResponse.includes?.Asset;
+  if (!assets || assets.length < 1) {
+    return undefined;
+  }
+  const assetFile = assets[0].fields.file;
+  return "https:" + assetFile?.url;
+};
 
-function extractPostEntries(fetchResponse: any): any[] {
-  return fetchResponse?.data?.drinksCollection?.items;
-}
+export type DrinkWithUrl = Fields<TypeDrinksSkeleton> & {
+  url: string | undefined;
+};
 
-export async function getDrinkBySlug(slug: string | null): Promise<any> {
-  const entry = await fetchGraphQL(
-    `query {
-      drinksCollection(where: {slug: "${slug}"})  {
-        items {
-          ${POST_GRAPHQL_FIELDS}
-        }
-      }
-    }`,
-  );
-  return extractPost(entry);
-}
-
-export async function getAllDrinks(): Promise<any[]> {
-  const entries = await fetchGraphQL(
-    `query {
-      drinksCollection{
-        items {
-          ${POST_GRAPHQL_FIELDS}
-        }
-      }
-    }`,
-  );
-  return extractPostEntries(entries);
-}
-
-export async function getPostAndMorePosts(
-  slug: string,
-  preview: boolean,
-): Promise<any> {
-  const entry = await fetchGraphQL(
-    `query {
-      postCollection(where: { slug: "${slug}" }, preview: ${
-        preview ? "true" : "false"
-      }, limit: 1) {
-        items {
-          ${POST_GRAPHQL_FIELDS}
-        }
-      }
-    }`,
-  );
-  const entries = await fetchGraphQL(
-    `query {
-      postCollection(where: { slug_not_in: "${slug}" }, order: date_DESC, preview: ${
-        preview ? "true" : "false"
-      }, limit: 2) {
-        items {
-          ${POST_GRAPHQL_FIELDS}
-        }
-      }
-    }`,
-  );
+function extractDrinkRest(
+  fetchResponse: EntryCollection<
+    TypeDrinksSkeleton,
+    "WITHOUT_UNRESOLVABLE_LINKS"
+  >,
+): DrinkWithUrl {
+  const entry = extractDrinksRest(fetchResponse)[0];
   return {
-    post: extractPost(entry),
-    morePosts: extractPostEntries(entries),
+    ...entry,
+    url: extractFirstImageUrl(fetchResponse),
   };
+}
+
+function extractDrinksRest(
+  fetchResponse: EntryCollection<
+    TypeDrinksSkeleton,
+    "WITHOUT_UNRESOLVABLE_LINKS"
+  >,
+): Array<Fields<TypeDrinksSkeleton>> {
+  return fetchResponse.items.map((i) => i.fields);
+}
+
+export async function getDrinkBySlug(slug: string): Promise<DrinkWithUrl> {
+  const searchParams = {
+    "fields.slug": slug,
+    content_type: "drinks",
+  };
+  const entry = await fetchRest<TypeDrinksSkeleton>(
+    new URLSearchParams(searchParams),
+  );
+  return extractDrinkRest(entry);
+}
+
+export async function getAllDrinks(): Promise<
+  Array<Fields<TypeDrinksSkeleton>>
+> {
+  const searchParams = new URLSearchParams("content_type=drinks");
+  const entries = await fetchRest<TypeDrinksSkeleton>(searchParams);
+  return extractDrinksRest(entries);
 }

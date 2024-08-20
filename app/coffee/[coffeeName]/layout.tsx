@@ -8,7 +8,7 @@ export default async function CoffeeLayout({
 }>) {
   const drinks = await getAllDrinks();
   return (
-    <div className={"flex"}>
+    <div className="flex">
       <div>
         <h1>COFFEE MENU</h1>
         {drinks.map((drink) => (

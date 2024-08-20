@@ -1,3 +1,18 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@stylistic/recommended-extends",
+    "next/core-web-vitals"
+  ],
+  "rules": {
+    "react/no-unescaped-entities": "off",
+    "@stylistic/indent": ["error", 4, { "ignoredNodes": ["JSXAttribute"] }],
+    "@stylistic/quotes": ["error", "double", { "allowTemplateLiterals": true }],
+    "@stylistic/padded-blocks": "off",
+    "@stylistic/no-extra-semi": "error",
+    "@stylistic/semi": ["error", "always"],
+    "@stylistic/brace-style": ["error", "1tbs"]
+  }
 }
+
+// For documentation of @stylistic rules, see https://eslint.style/rules
