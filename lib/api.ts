@@ -1,5 +1,6 @@
 import { TypeBaristaSkeleton, TypeDrinksSkeleton } from "@/lib/contentfulTypes";
 import type { EntryCollection, EntrySkeletonType } from "contentful";
+import { canAccessBaristas } from "./userService";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const extractFieldsFromItems = <TSkeleton extends EntrySkeletonType>(
@@ -89,6 +90,15 @@ export async function getBaristaBySlug(slug: string): Promise<Fields<TypeBarista
         new URLSearchParams(searchParams),
     );
     return entry.items[0].fields;
+}
+
+export async function getBaristas(): Promise<Array<Fields<TypeBaristaSkeleton>>> {
+    if (!canAccessBaristas()) {
+        return [];
+    }
+    const searchParams = new URLSearchParams("content_type=barista");
+    const entries = await fetchRest<TypeBaristaSkeleton>(searchParams);
+    return entries.items.map(i => i.fields);
 }
 
 export async function getAllDrinks(): Promise<

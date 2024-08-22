@@ -1,11 +1,10 @@
-import { cookies } from "next/headers";
+import { canAccessBaristas } from "@/lib/userService";
 
 export async function Hello() {
-    const sessionCookie = cookies().get("session");
-
+    const canUserAccessBaristas = canAccessBaristas();
     return (
         <>
-            {sessionCookie?.value || "Login to say hello"}
+            {canUserAccessBaristas ? "hello" : "Login to say hello"}
         </>
     );
 }

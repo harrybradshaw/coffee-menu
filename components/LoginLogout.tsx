@@ -1,11 +1,18 @@
 "use client";
 import { createSession, deleteSession } from "@/lib/session";
 
-export default function LoginLogout() {
+interface LoginLogoutProps {
+    isLoggedIn: boolean
+}
+
+export default function LoginLogout({ isLoggedIn }: LoginLogoutProps) {
     return (
         <>
-            <button onClick={() => createSession()}>Login</button>
-            <button onClick={() => deleteSession()}>Logout</button>
+            {
+                isLoggedIn
+                    ? <button onClick={() => deleteSession()}>Logout</button>
+                    : <button onClick={() => createSession()}>Login</button>
+            }
         </>
     );
 }
