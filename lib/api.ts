@@ -1,4 +1,4 @@
-import { TypeDrinksSkeleton } from "@/lib/contentfulTypes";
+import { TypeBaristaSkeleton, TypeDrinksSkeleton } from "@/lib/contentfulTypes";
 import type { EntryCollection, EntrySkeletonType } from "contentful";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -22,6 +22,8 @@ export async function fetchRest<TReturn extends EntrySkeletonType>(
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
             },
+            // NextJs v14 default behaviour is 'force-cache'. Will change in v15 to be 'no-store'.
+            // cache: "no-store",
             next: { tags: [drinksTag] },
         },
     ).then(response => response.json());
@@ -39,6 +41,7 @@ const extractFirstImageUrl = (
 };
 
 export type DrinkWithUrl = Fields<TypeDrinksSkeleton> & {
+    id: string
     url: string | undefined
 };
 
@@ -49,8 +52,10 @@ function extractDrinkRest(
     >,
 ): DrinkWithUrl {
     const entry = extractDrinksRest(fetchResponse)[0];
+    const id = fetchResponse.items[0].sys.id;
     return {
         ...entry,
+        id,
         url: extractFirstImageUrl(fetchResponse),
     };
 }
@@ -73,6 +78,17 @@ export async function getDrinkBySlug(slug: string): Promise<DrinkWithUrl> {
         new URLSearchParams(searchParams),
     );
     return extractDrinkRest(entry);
+}
+
+export async function getBaristaBySlug(slug: string): Promise<Fields<TypeBaristaSkeleton>> {
+    const searchParams = {
+        "fields.firstName[match]": slug,
+        "content_type": "barista",
+    };
+    const entry = await fetchRest<TypeBaristaSkeleton>(
+        new URLSearchParams(searchParams),
+    );
+    return entry.items[0].fields;
 }
 
 export async function getAllDrinks(): Promise<

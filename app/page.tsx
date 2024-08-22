@@ -1,16 +1,19 @@
-import { getAllDrinks } from "@/lib/api";
-import Link from "next/link";
+import { Hello } from "@/components/Hello";
+import LayoutLinks from "@/components/LayoutLinks";
+import LoginLogout from "@/components/LoginLogout";
 
 export default async function Home() {
-    const drinks = await getAllDrinks();
     return (
-        <div>
-            <h1>COFFEE MENU</h1>
-            {drinks.map(drink => (
-                <div key={drink.name}>
-                    <Link href={`/coffee/${drink.slug}`}>{drink.name}</Link>
-                </div>
-            ))}
+        <div className="flex">
+            <div className="mx-4">
+                <h1>COFFEE MENU</h1>
+                <LayoutLinks />
+                <LoginLogout />
+            </div>
+            <div className="flex-1">
+                <Hello />
+            </div>
         </div>
+
     );
 }

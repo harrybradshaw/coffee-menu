@@ -11,7 +11,8 @@
     "@stylistic/padded-blocks": "off",
     "@stylistic/no-extra-semi": "error",
     "@stylistic/semi": ["error", "always"],
-    "@stylistic/brace-style": ["error", "1tbs"]
+    "@stylistic/brace-style": ["error", "1tbs"],
+    "@stylistic/jsx-one-expression-per-line": "off"
   }
 }
 

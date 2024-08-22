@@ -1,23 +1,46 @@
-import { getAllDrinks } from "@/lib/api";
+import LayoutLinks from "@/components/LayoutLinks";
+import ShoppingCartHeader from "@/components/ShoppingCartHeader";
+import { getDrinkBySlug } from "@/lib/api";
 import Link from "next/link";
+import React from "react";
 
 export default async function CoffeeLayout({
+    params,
     children,
+    recipe,
 }: Readonly<{
+    params: { coffeeName: string }
     children: React.ReactNode
+    recipe: React.ReactNode
 }>) {
-    const drinks = await getAllDrinks();
+    const drink = await getDrinkBySlug(params.coffeeName);
+
     return (
         <div className="flex">
-            <div>
-                <h1>COFFEE MENU</h1>
-                {drinks.map(drink => (
-                    <div key={drink.name}>
-                        <Link href={`/coffee/${drink.slug}`}>{drink.name}</Link>
-                    </div>
-                ))}
+            <div className="mx-3">
+                <Link href="/">
+                    <h1>COFFEE MENU</h1>
+                </Link>
+                <LayoutLinks />
             </div>
-            {children}
+            <div className="flex-1">
+                <div className="flex mb-4">
+                    <div className="flex-1">
+                        <h2>{drink.name}</h2>
+                    </div>
+                    <div>
+                        <ShoppingCartHeader />
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="flex-1">
+                        {children}
+                    </div>
+                    <div className="">
+                        {recipe}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
