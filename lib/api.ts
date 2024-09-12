@@ -1,6 +1,5 @@
 import { TypeBaristaSkeleton, TypeDrinksSkeleton } from "@/lib/contentfulTypes";
 import type { EntryCollection, EntrySkeletonType } from "contentful";
-import { draftMode } from "next/headers";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const extractFieldsFromItems = <TSkeleton extends EntrySkeletonType>(
@@ -14,12 +13,11 @@ export const drinksTag = "drinks";
 
 export async function fetchRest<TReturn extends EntrySkeletonType>(
     searchParams: URLSearchParams,
-    isDraftMode = false,
 ): Promise<EntryCollection<TReturn, "WITHOUT_UNRESOLVABLE_LINKS">> {
-    const subdomin = isDraftMode ? "preview" : "cdn";
-    const accessToken = isDraftMode ? process.env.CONTENTFUL_PREVIEW_TOKEN : process.env.CONTENTFUL_ACCESS_TOKEN;
+    const accessToken = process.env.CONTENTFUL_PREVIEW_TOKEN || process.env.CONTENTFUL_ACCESS_TOKEN;
+    const subdomain = process.env.CONTENTFUL_PREVIEW_TOKEN ? "preview" : "cdn";
     return fetch(
-        `https://${subdomin}.contentful.com/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/master/entries?${searchParams.toString()}`,
+        `https://${subdomain}.contentful.com/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/master/entries?${searchParams.toString()}`,
         {
             method: "GET",
             headers: {
@@ -78,10 +76,8 @@ export async function getDrinkBySlug(slug: string): Promise<DrinkWithUrl> {
         "fields.slug": slug,
         "content_type": "drinks",
     };
-    const { isEnabled } = draftMode();
     const entry = await fetchRest<TypeDrinksSkeleton>(
         new URLSearchParams(searchParams),
-        isEnabled,
     );
     return extractDrinkRest(entry);
 }
