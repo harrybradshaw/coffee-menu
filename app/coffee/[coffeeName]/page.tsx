@@ -2,6 +2,7 @@ import React from "react";
 import { getAllDrinks, getDrinkBySlug } from "@/lib/api";
 import Image from "next/image";
 import { BuyDrink } from "@/components/BuyDrink";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
 export default async function CoffeePage({
     params,
@@ -20,6 +21,7 @@ export default async function CoffeePage({
               width={500}
               height={500}
             />
+            <>{drink?.taste ? documentToReactComponents(drink.taste) : null}</>
             <BuyDrink drink={drink} />
         </div>
     );

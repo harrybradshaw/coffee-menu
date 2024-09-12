@@ -1,5 +1,6 @@
 import { TypeBaristaSkeleton, TypeDrinksSkeleton } from "@/lib/contentfulTypes";
 import type { EntryCollection, EntrySkeletonType } from "contentful";
+import { draftMode } from "next/headers";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const extractFieldsFromItems = <TSkeleton extends EntrySkeletonType>(
@@ -13,14 +14,17 @@ export const drinksTag = "drinks";
 
 export async function fetchRest<TReturn extends EntrySkeletonType>(
     searchParams: URLSearchParams,
+    isDraftMode = false,
 ): Promise<EntryCollection<TReturn, "WITHOUT_UNRESOLVABLE_LINKS">> {
+    const subdomin = isDraftMode ? "preview" : "cdn";
+    const accessToken = isDraftMode ? process.env.CONTENTFUL_PREVIEW_TOKEN : process.env.CONTENTFUL_ACCESS_TOKEN;
     return fetch(
-        `https://cdn.contentful.com/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/master/entries?${searchParams.toString()}`,
+        `https://${subdomin}.contentful.com/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/master/entries?${searchParams.toString()}`,
         {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+                "Authorization": `Bearer ${accessToken}`,
             },
             // NextJs v14 default behaviour is 'force-cache'. Will change in v15 to be 'no-store'.
             // cache: "no-store",
@@ -74,8 +78,10 @@ export async function getDrinkBySlug(slug: string): Promise<DrinkWithUrl> {
         "fields.slug": slug,
         "content_type": "drinks",
     };
+    const { isEnabled } = draftMode();
     const entry = await fetchRest<TypeDrinksSkeleton>(
         new URLSearchParams(searchParams),
+        isEnabled,
     );
     return extractDrinkRest(entry);
 }
