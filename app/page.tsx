@@ -1,6 +1,7 @@
 import { Hello } from "@/components/Hello";
 import LayoutLinks from "@/components/LayoutLinks";
 import LoginLogout from "@/components/LoginLogout";
+import { Calendar } from "@harrybradshaw/coffee-calendar";
 
 export default async function Home() {
     return (
@@ -12,6 +13,7 @@ export default async function Home() {
             </div>
             <div className="flex-1">
                 <Hello />
+                <Calendar />
             </div>
         </div>
 
