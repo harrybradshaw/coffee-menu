@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { drinksTag } from "@/lib/api";
 
 export async function POST(request: Request) {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     revalidateTag(drinksTag);
-    revalidatePath("/coffee/[coffeeName]", "layout");
+    // revalidatePath("/coffee/[coffeeName]", "layout");
 
     return NextResponse.json({ revalidated: true, now: Date.now() });
 }
